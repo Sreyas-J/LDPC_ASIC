@@ -1,16 +1,16 @@
 
 module CN_Update(
-
+    input cn_ena,
     input reset,
     input [8:0] mcv_tprev,
-    input [4:0] Lvc,
+    input [4:0] Lvc_tprev,
     output [8:0] mcv_t
     
     );
     
     // Input fields
-    wire sc_tprev, Lvc_sign;
-    wire [3:0] min1c_tprev, min2c_tprev, Lvc_mag;
+    wire sc_tprev, Lvc_tprev_sign;
+    wire [3:0] min1c_tprev, min2c_tprev, Lvc_tprev_mag;
     
     // output fields
     reg sc_t;
@@ -20,39 +20,51 @@ module CN_Update(
     assign sc_tprev = mcv_tprev[8];
     assign min1c_tprev = mcv_tprev[7:4];
     assign min2c_tprev = mcv_tprev[3:0];
-    assign Lvc_sign = Lvc[4];
-    assign Lvc_mag = Lvc[3:0];
+    assign Lvc_tprev_sign = Lvc_tprev[4];
+    assign Lvc_tprev_mag = Lvc_tprev[3:0];
     
     
-    // Logic- Active high reset
+    // Logic- Active high reset and active high enable
     always @(*)
     begin
     
-        if(reset) 
+        if(cn_ena)
         begin
-            sc_t = Lvc_sign;
-            min1c_t = Lvc_mag;
-            min2c_t = 4'b1111;
+    
+            if(reset) 
+            begin
+                sc_t = Lvc_tprev_sign;
+                min1c_t = Lvc_tprev_mag;
+                min2c_t = 4'b1111;
+            end
+            else
+            begin
+            
+                sc_t = sc_tprev ^ Lvc_tprev_sign;
+                if (Lvc_tprev_mag < min1c_tprev)
+                begin
+                    min2c_t = min1c_tprev;
+                    min1c_t = Lvc_tprev_mag;
+                end
+                else if (Lvc_tprev_mag < min2c_tprev)
+                begin
+                    min1c_t = min1c_tprev;
+                    min2c_t = Lvc_tprev_mag;
+                end
+                else
+                begin
+                    min1c_t = min1c_tprev;
+                    min2c_t = min2c_tprev;
+                end
+            
+            end
         end
         else
         begin
         
-            sc_t = sc_tprev ^ Lvc_sign;
-            if (Lvc_mag < min1c_tprev)
-            begin
-                min2c_t = min1c_tprev;
-                min1c_t = Lvc_mag;
-            end
-            else if (Lvc_mag < min2c_tprev)
-            begin
-                min1c_t = min1c_tprev;
-                min2c_t = Lvc_mag;
-            end
-            else
-            begin
-                min1c_t = min1c_tprev;
-                min2c_t = min2c_tprev;
-            end
+            sc_t = sc_t;
+            min1c_t = min1c_t;
+            min2c_t = min2c_t;
         
         end
     
