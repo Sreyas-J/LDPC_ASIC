@@ -2,6 +2,7 @@
 module VN_Update(
 
     input clk,
+    input vn_ena,
     input [8:0] mcv_tprev,
     input [4:0] Lvc_tprev,
     input [6:0] Lv,
@@ -40,17 +41,18 @@ module VN_Update(
     end
     
     assign  mcv_sign = Lvc_tprev_sign ^ sc_tprev;
-    assign mcv = (mcv_sign) ? ~{1'b0, (mcv_mag + 1'b1)} : {1'b0,mcv_mag};
+    assign mcv = (mcv_sign) ? -{1'b0, mcv_mag} : {1'b0, mcv_mag};
     
-    // Sequential block
+    
+    // This is the gated Flip flop
+//    // Sequential block
     always @(posedge clk)
     begin
         Lvc_reg <= Lv - mcv;
     end
     
     
-//    assign Lvc = (Lvc_reg[4]) ? ~{1'b0, (Lvc_reg[3:0] + 1'b1)} : Lvc_reg;
-      assign Lvc = Lvc_reg;    
-    
+//    assign Lvc_reg = Lv-mcv;
+    assign Lvc =  (vn_ena) ? {Lvc_reg[4], (Lvc_reg[4] ? -Lvc_reg[3:0] : Lvc_reg[3:0])} : Lvc;    
     
 endmodule
