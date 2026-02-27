@@ -5,10 +5,12 @@ module PE(
     input clk,
     input iter_flag,
     input reset,
-    input cn_vn_sel, // To select CN : 0 or else for VN : 1
+    input cn_sel,
+    input vn_sel,
+    input [2:0] bypass, 
     input [26:0] mcv_tprev,
     input [4:0] Qv,
-    output [26:0] mcv_t,
+    output reg [26:0] mcv_t,
     output Cv
     );
     
@@ -18,6 +20,7 @@ module PE(
     wire [14:0] Lvc;
     wire [14:0] Lvc_muxed;
     wire [6:0] Lv;
+    wire [26:0] mcv_temp;
     
     Lvc_mem Lvc_cache(.clk(clk), .din(Lvc), .w_ena(w_ena), .dout(Lvc_tprev));
     
@@ -32,17 +35,19 @@ module PE(
     
     
                 CN_Update layeri_cn (
-                    .cn_ena(~cn_vn_sel),
+                    .cn_ena(cn_sel),
                     .reset(reset),
+                    .bypass(bypass[i]),
                     .mcv_tprev(mcv_tprev[9*i +: 9]),
                     .Lvc_tprev(Lvc_muxed[5*i +: 5]),
-                    .mcv_t(mcv_t[9*i +: 9])
+                    .mcv_t(mcv_temp[9*i +: 9])
                 );
                 
                 
                 VN_Update layeri_vn (
                      .clk(clk),
-                    .vn_ena(cn_vn_sel), 
+                    .vn_ena(vn_sel),
+                    .bypass(bypass[i]), 
                     .mcv_tprev(mcv_tprev[9*i +: 9]), 
                     .Lvc_tprev(Lvc_muxed[5*i +: 5]), 
                     .Lv(Lv), // need to edit
@@ -56,11 +61,25 @@ module PE(
     
     always @(posedge clk)
     begin
-        w_ena <= cn_vn_sel;
+        w_ena <= vn_sel;
     end
     
     assign Lv = mcv[4:0] + mcv[9:5] + mcv[14:10] + Qv;
     assign Cv = (Lv > 0) ? 1'b0 : 1'b1;
+    
+    always @(posedge clk)
+    begin
+    
+        if((vn_sel) || (cn_sel))
+        begin
+            mcv_t <= mcv_temp;
+        end
+        else
+        begin
+            mcv_t <= mcv_tprev;
+        end
+    
+    end
     
     
     

@@ -3,6 +3,7 @@ module VN_Update(
 
     input clk,
     input vn_ena,
+    input bypass,
     input [8:0] mcv_tprev,
     input [4:0] Lvc_tprev,
     input [6:0] Lv,
@@ -41,7 +42,7 @@ module VN_Update(
     end
     
     assign  mcv_sign = Lvc_tprev_sign ^ sc_tprev;
-    assign mcv = (mcv_sign) ? -{1'b0, mcv_mag} : {1'b0, mcv_mag};
+    assign mcv = (!bypass) ? ((vn_ena) ? ((mcv_sign) ? -{1'b0, mcv_mag} : {1'b0, mcv_mag}) : mcv) : 0;
     
     
     // This is the gated Flip flop
