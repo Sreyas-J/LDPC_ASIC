@@ -1,0 +1,15 @@
+Time resolution is 1 ps
+Starting LDPC CU Simulation...
+Stopped at time : 155 ns : File "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sim_1/new/tb.v" Line 77
+Starting LDPC CU Simulation...
+Stopped at time : 155 ns : File "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sim_1/new/tb.v" Line 77
+Time=155000 | iter= 0 | count=0 | cn_sel=1 | vn_sel=0 | iter_flag=1 | cn_reset=1
+Stopped at time : 165 ns : File "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sim_1/new/tb.v" Line 77
+Time=165000 | iter= 0 | count=1 | cn_sel=1 | vn_sel=0 | iter_flag=1 | cn_reset=0
+Stopped at time : 175 ns : File "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sim_1/new/tb.v" Line 77
+Starting LDPC CU Simulation...
+Stopped at time : 155 ns : File "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sim_1/new/tb.v" Line 77
+Time=155000 | iter= 0 | count=0 | cn_sel=1 | vn_sel=0 | iter_flag=1 | cn_reset=1
+Stopped at time : 165 ns : File "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sim_1/new/tb.v" Line 77
+Time=165000 | iter= 0 | count=1 | cn_sel=1 | vn_sel=0 | iter_flag=1 | cn_reset=0
+Stopped at time : 175 ns : File "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sim_1/new/tb.v" Line 77

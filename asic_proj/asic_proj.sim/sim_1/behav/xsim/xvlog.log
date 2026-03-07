@@ -1,0 +1,18 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sources_1/imports/LDPC_ASIC/CN_Update.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module CN_Update
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sources_1/imports/LDPC_ASIC/Lvc_mem.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module Lvc_mem
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sources_1/imports/LDPC_ASIC/PE.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module PE
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sources_1/imports/LDPC_ASIC/VN_Update.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module VN_Update
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sources_1/imports/LDPC_ASIC/gen.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module gen
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sources_1/imports/LDPC_ASIC/rom_bypass.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module rom_bypass
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sources_1/imports/LDPC_ASIC/rom_edgelist.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module rom_edgelist
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sources_1/imports/LDPC_ASIC/rom_qv.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module rom_qv
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sim_1/new/tb.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_gen
