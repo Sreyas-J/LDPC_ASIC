@@ -4,7 +4,7 @@
 <!-- Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.                   -->
 <!-- Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.   -->
 
-<Project Product="Vivado" Version="7" Minor="63" Path="/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.xpr">
+<Project Product="Vivado" Version="7" Minor="63" Path="/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/asic_proj/asic_proj.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="6f5810fb090f41beb8448b2b65ade379"/>
@@ -44,7 +44,7 @@
     <Option Name="SimulatorGccVersionRiviera" Val="9.3.0"/>
     <Option Name="SimulatorGccVersionActiveHdl" Val="9.3.0"/>
     <Option Name="BoardPart" Val=""/>
-    <Option Name="BoardPartRepoPaths" Val="$PPRDIR/../../../../../.Xilinx/Vivado/2023.1/xhub/board_store/xilinx_board_store"/>
+    <Option Name="BoardPartRepoPaths" Val="$PPRDIR/../../../../../../.Xilinx/Vivado/2023.1/xhub/board_store/xilinx_board_store"/>
     <Option Name="ActiveSimSet" Val="sim_1"/>
     <Option Name="DefaultLib" Val="xil_defaultlib"/>
     <Option Name="ProjectType" Val="Default"/>
@@ -59,7 +59,7 @@
     <Option Name="IPUserFilesDir" Val="$PIPUSERFILESDIR"/>
     <Option Name="IPStaticSourceDir" Val="$PIPUSERFILESDIR/ipstatic"/>
     <Option Name="EnableBDX" Val="FALSE"/>
-    <Option Name="WTXSimLaunchSim" Val="35"/>
+    <Option Name="WTXSimLaunchSim" Val="40"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
@@ -92,7 +92,7 @@
       <Filter Type="Srcs"/>
       <File Path="$PSRCDIR/sources_1/imports/LDPC_ASIC/CN_Update.v">
         <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../LDPC_ASIC/CN_Update.v"/>
+          <Attr Name="ImportPath" Val="$PPRDIR/../CN_Update.v"/>
           <Attr Name="ImportTime" Val="1772778114"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -101,7 +101,7 @@
       </File>
       <File Path="$PSRCDIR/sources_1/imports/LDPC_ASIC/Lvc_mem.v">
         <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../LDPC_ASIC/Lvc_mem.v"/>
+          <Attr Name="ImportPath" Val="$PPRDIR/../Lvc_mem.v"/>
           <Attr Name="ImportTime" Val="1772778114"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -110,7 +110,7 @@
       </File>
       <File Path="$PSRCDIR/sources_1/imports/LDPC_ASIC/PE.v">
         <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../LDPC_ASIC/PE.v"/>
+          <Attr Name="ImportPath" Val="$PPRDIR/../PE.v"/>
           <Attr Name="ImportTime" Val="1772778114"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -119,34 +119,7 @@
       </File>
       <File Path="$PSRCDIR/sources_1/imports/LDPC_ASIC/VN_Update.v">
         <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../LDPC_ASIC/VN_Update.v"/>
-          <Attr Name="ImportTime" Val="1772778114"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/LDPC_ASIC/rom_bypass.v">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../LDPC_ASIC/rom_bypass.v"/>
-          <Attr Name="ImportTime" Val="1772778114"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/LDPC_ASIC/rom_edgelist.v">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../LDPC_ASIC/rom_edgelist.v"/>
-          <Attr Name="ImportTime" Val="1772778114"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/LDPC_ASIC/rom_qv.v">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../LDPC_ASIC/rom_qv.v"/>
+          <Attr Name="ImportPath" Val="$PPRDIR/../VN_Update.v"/>
           <Attr Name="ImportTime" Val="1772778114"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -155,7 +128,37 @@
       </File>
       <File Path="$PSRCDIR/sources_1/imports/LDPC_ASIC/gen.v">
         <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../LDPC_ASIC/gen.v"/>
+          <Attr Name="ImportPath" Val="$PPRDIR/../gen.v"/>
+          <Attr Name="ImportTime" Val="1772778114"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/imports/LDPC_ASIC/rom_qv.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="ImportPath" Val="$PPRDIR/../rom_qv.v"/>
+          <Attr Name="ImportTime" Val="1772778114"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/imports/LDPC_ASIC/rom_bypass.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="ImportPath" Val="$PPRDIR/../rom_bypass.v"/>
+          <Attr Name="ImportTime" Val="1772778114"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/imports/LDPC_ASIC/rom_edgelist.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="ImportPath" Val="$PPRDIR/../rom_edgelist.v"/>
           <Attr Name="ImportTime" Val="1772778114"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -176,8 +179,10 @@
     </FileSet>
     <FileSet Name="sim_1" Type="SimulationSrcs" RelSrcDir="$PSRCDIR/sim_1" RelGenDir="$PGENDIR/sim_1">
       <Filter Type="Srcs"/>
-      <File Path="$PSRCDIR/sim_1/new/tb.v">
+      <File Path="$PSRCDIR/sim_1/imports/Downloads/tb.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../../../../../Downloads/tb.v"/>
+          <Attr Name="ImportTime" Val="1772903624"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
