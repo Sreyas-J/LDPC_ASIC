@@ -1,2 +1,0 @@
-Breakpoint File Version 1.0
-77,true,"/home/pradyumna/Documents/sem8/ASIC/project/asic_proj/asic_proj.srcs/sim_1/new/tb.v"
