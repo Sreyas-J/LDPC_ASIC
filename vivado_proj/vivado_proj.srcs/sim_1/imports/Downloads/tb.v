@@ -1,25 +1,30 @@
 `timescale 1ns / 1ps
 
 // ============================================================
-//  LDPC Decoder — Testbench (controller-based)
+//  LDPC Decoder — Testbench (controller-based, parameterised)
 //
 //  Instantiates the top module (gen + controller).
 //  The testbench only drives: clk, rst, start, qv_flat.
 //  It waits for the 'done' pulse, then checks cv_list.
 //
-//  No manual cn_sel / vn_sel / iter_flag driving needed —
-//  the controller handles all sequencing automatically.
+//  Parameters match the default H matrix configuration.
+//  Adjust NUM_PE, NUM_CN, NUM_LAYERS, etc. when testing
+//  with a different H matrix.
 //
-//  Valid codewords for this (3,4)-regular LDPC graph:
+//  Valid codewords for the default (3,4)-regular LDPC graph:
 //    0x000, 0x2ce, 0x595, 0x75b, 0x963, 0xbad, 0xcf6, 0xe38
 // ============================================================
 
 module tb_gen;
 
-    reg         clk, rst, start;
-    reg  [59:0] qv_flat;   // 12 PEs x 5-bit LLR: PE0 at [4:0], PE11 at [59:55]
-    wire [11:0] cv_list;
-    wire        done;
+    // Parameters — match the decoder defaults
+    parameter NUM_PE   = 12;
+    parameter LLR_BITS = 5;
+
+    reg                          clk, rst, start;
+    reg  [NUM_PE*LLR_BITS-1:0]  qv_flat;
+    wire [NUM_PE-1:0]            cv_list;
+    wire                         done;
 
     top #(.MAX_ITER(5)) dut (
         .clk    (clk),
@@ -37,36 +42,34 @@ module tb_gen;
     initial begin pass_count = 0; fail_count = 0; end
 
     // Build qv_flat from codeword + introduced error.
-    // PE k's 5-bit LLR occupies qv_flat[5*k +: 5].
+    // PE k's LLR_BITS-bit LLR occupies qv_flat[LLR_BITS*k +: LLR_BITS].
     // bit=1 -> -7 (5'h17), bit=0 -> +7 (5'h07). Error PE gets sign flipped.
     task load_qv;
-        input [11:0] codeword;
+        input [NUM_PE-1:0] codeword;
         input [3:0]  error_pe;
         integer k;
-        reg [4:0] val;
+        reg [LLR_BITS-1:0] val;
         begin
-            qv_flat = 60'b0;
-            for (k = 0; k < 12; k = k + 1) begin
+            qv_flat = {(NUM_PE*LLR_BITS){1'b0}};
+            for (k = 0; k < NUM_PE; k = k + 1) begin
                 if (codeword[k])
                     val = 5'h17;       // bit=1 -> -7
                 else
                     val = 5'h07;       // bit=0 -> +7
                 if (k == error_pe)
                     val = val ^ 5'h10; // flip sign bit to simulate channel error
-                qv_flat[5*k +: 5] = val;
+                qv_flat[LLR_BITS*k +: LLR_BITS] = val;
             end
         end
     endtask
 
     // Run one complete test case.
-    // Loads LLRs, pulses start, waits for done, checks result.
-    // No manual sequencing — the controller handles everything.
     task run_test;
-        input [11:0] codeword;
+        input [NUM_PE-1:0] codeword;
         input [3:0]  error_pe;
-        reg [11:0] naive;
+        reg [NUM_PE-1:0] naive;
         begin
-            naive = codeword ^ (12'b1 << error_pe);
+            naive = codeword ^ ({{(NUM_PE-1){1'b0}}, 1'b1} << error_pe);
             $display("  Codeword: %3h | Error at PE%0d | Naive: %3h",
                      codeword, error_pe, naive);
 
@@ -94,7 +97,7 @@ module tb_gen;
 
     // ---- main test sequence ------------------------------------
     initial begin
-        rst = 1; start = 0; qv_flat = 60'b0;
+        rst = 1; start = 0; qv_flat = {(NUM_PE*LLR_BITS){1'b0}};
         @(posedge clk); #1;
         @(posedge clk); #1;
         rst = 0;

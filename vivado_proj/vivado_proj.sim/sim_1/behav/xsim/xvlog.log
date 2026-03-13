@@ -1,16 +1,2 @@
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/Lvc_mem.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module Lvc_mem
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/PE.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module PE
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/VN_Update.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module VN_Update
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/controller.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module controller
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/gen.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module gen
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/top.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module top
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sim_1/imports/Controller_Added/tb.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sim_1/imports/Downloads/tb.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module tb_gen
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.sim/sim_1/behav/xsim/glbl.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module glbl

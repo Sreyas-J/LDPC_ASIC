@@ -1,10 +1,12 @@
-module VN_Update(
+module VN_Update #(
+    parameter LV_BITS = 7
+)(
     input clk,
     input vn_ena,
     input bypass,
     input [8:0] mcv_tprev,
     input [4:0] Lvc_tprev,
-    input signed [6:0] Lv,
+    input signed [LV_BITS-1:0] Lv,
     output signed [4:0] Lvc,
     output [4:0] mcv
 );
@@ -51,14 +53,16 @@ module VN_Update(
     end
     assign mcv = mcv_latch;
 
-    // Saturation (Lv - mcv can be ±78 → clamp to 5-bit range)
-    wire signed [6:0] Lvc_full;
-    assign Lvc_full = Lv - $signed({{2{mcv[4]}}, mcv});
+    // Saturation (Lv - mcv can exceed 5-bit range → clamp)
+    wire signed [LV_BITS-1:0] Lvc_full;
+    wire signed [LV_BITS-1:0] mcv_ext;
+    assign mcv_ext = {{(LV_BITS-5){mcv[4]}}, mcv};
+    assign Lvc_full = Lv - mcv_ext;
 
     always @(posedge clk) begin
-        if      (Lvc_full >  7'sd15) Lvc_reg <=  5'sd15;
-        else if (Lvc_full < -7'sd15) Lvc_reg <= -5'sd15;
-        else                         Lvc_reg <= Lvc_full[4:0];
+        if      (Lvc_full >  $signed({{(LV_BITS-5){1'b0}}, 5'sd15}))  Lvc_reg <=  5'sd15;
+        else if (Lvc_full < -$signed({{(LV_BITS-5){1'b0}}, 5'sd15}))  Lvc_reg <= -5'sd15;
+        else                                                            Lvc_reg <= Lvc_full[4:0];
     end
 
     // Absolute value for correct sign-magnitude output

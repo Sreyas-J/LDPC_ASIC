@@ -28,14 +28,15 @@ output reg [11:0] cv_list
     // ---------------------------------------------------------------
     // Check node membership: which PEs are connected to each CN (by layer)
     //
-    // Layer 0: CN0={PE0,PE5,PE7,PE9} CN1={PE1,PE3,PE8,PE10} CN2={PE2,PE4,PE6,PE11}
-    // Layer 1: CN3={PE5,PE6,PE9}     CN4={PE3,PE7,PE10}     CN5={PE4,PE8,PE11}
-    //          (PE0 bypassed in CN3, PE1 in CN4, PE2 in CN5)
-    // Layer 2: CN6={PE0,PE5,PE10}    CN7={PE1,PE3,PE11}     CN8={PE2,PE4,PE9}
-    //          (PE6 bypassed in CN7->wait no, PE8 bypassed in CN6? Let me recheck)
+    // Layer 0: CN0={PE1,PE3,PE11} + PE6*   CN1={PE2,PE4,PE9} + PE7*   CN2={PE0,PE5,PE10} + PE8*
+    //          (* = bypassed: PE6 in CN0, PE7 in CN1, PE8 in CN2)
+    // Layer 1: CN3={PE5,PE6,PE9} + PE0*    CN4={PE3,PE7,PE10} + PE1*  CN5={PE4,PE8,PE11} + PE2*
+    //          (* = bypassed: PE0 in CN3, PE1 in CN4, PE2 in CN5)
+    // Layer 2: CN6={PE1,PE3,PE8,PE10}      CN7={PE2,PE4,PE6,PE11}     CN8={PE0,PE5,PE7,PE9}
+    //          (no bypasses in layer 2)
     //
     // Bypass: PE0=layer1, PE1=layer1, PE2=layer1
-    //         PE6=layer2, PE7=layer2, PE8=layer2
+    //         PE6=layer0, PE7=layer0, PE8=layer0
     //         (PEs 3,4,5,9,10,11 = no bypass)
     
     reg [2:0]  bypass [0:11];
@@ -78,15 +79,15 @@ output reg [11:0] cv_list
         edgelist[10] = 12'h878;
         edgelist[11] = 12'h686;
     
-        bypass_list[0]  = 4'h9;
-        bypass_list[1]  = 4'ha;
-        bypass_list[2]  = 4'hb;
+        bypass_list[0]  = 4'h3;
+        bypass_list[1]  = 4'h4;
+        bypass_list[2]  = 4'h5;
         bypass_list[3]  = 4'hF;
         bypass_list[4]  = 4'hF;
         bypass_list[5]  = 4'hF;
-        bypass_list[6]  = 4'h3;
-        bypass_list[7]  = 4'h4;
-        bypass_list[8]  = 4'h5;
+        bypass_list[6]  = 4'h0;
+        bypass_list[7]  = 4'h1;
+        bypass_list[8]  = 4'h2;
         bypass_list[9]  = 4'hF;
         bypass_list[10] = 4'hF;
         bypass_list[11] = 4'hF;
@@ -115,15 +116,15 @@ output reg [11:0] cv_list
     //   min2     = second minimum magnitude
     //
     // The check nodes are identified by (layer, chain_index):
-    //   CN0 (layer0): PEs {0,5,7,9}   — all active
-    //   CN1 (layer0): PEs {1,3,8,10}  — all active
-    //   CN2 (layer0): PEs {2,4,6,11}  — all active
-    //   CN3 (layer1): PEs {0*,5,6,9}  — PE0 bypassed
-    //   CN4 (layer1): PEs {1*,3,7,10} — PE1 bypassed
-    //   CN5 (layer1): PEs {2*,4,8,11} — PE2 bypassed
-    //   CN6 (layer2): PEs {0,5,8*,10} — PE8 bypassed
-    //   CN7 (layer2): PEs {1,3,6*,11} — PE6 bypassed
-    //   CN8 (layer2): PEs {2,4,7*,9}  — PE7 bypassed
+    //   CN0 (layer0): PEs {1,3,6*,11}  — PE6 bypassed
+    //   CN1 (layer0): PEs {2,4,7*,9}   — PE7 bypassed
+    //   CN2 (layer0): PEs {0,5,8*,10}  — PE8 bypassed
+    //   CN3 (layer1): PEs {0*,5,6,9}   — PE0 bypassed
+    //   CN4 (layer1): PEs {1*,3,7,10}  — PE1 bypassed
+    //   CN5 (layer1): PEs {2*,4,8,11}  — PE2 bypassed
+    //   CN6 (layer2): PEs {1,3,8,10}   — all active
+    //   CN7 (layer2): PEs {2,4,6,11}   — all active
+    //   CN8 (layer2): PEs {0,5,7,9}    — all active
     //
     // Each PE's Lvc for layer L is at Lvc_muxed[PE][5*L +: 5]
     // ---------------------------------------------------------------
@@ -154,49 +155,25 @@ output reg [11:0] cv_list
     reg        cn_lvc_sign_tmp;
 
     always @(*) begin
-        // ------ CN0 (layer 0): PEs 0, 5, 7, 9 ------
-        cn_sc = lvc_sign[0][0];
-        cn_min1 = lvc_mag[0][0];
+        // ------ CN0 (layer 0): PEs 1, 3, 11 (PE6 bypassed) ------
+        cn_sc = lvc_sign[1][0];
+        cn_min1 = lvc_mag[1][0];
         cn_min2 = 4'hF;
-        // Accumulate PE5
-        cn_lvc_sign_tmp = lvc_sign[5][0];
-        cn_lvc_mag_tmp = lvc_mag[5][0];
+        // Accumulate PE3
+        cn_lvc_sign_tmp = lvc_sign[3][0];
+        cn_lvc_mag_tmp = lvc_mag[3][0];
         cn_sc = cn_sc ^ cn_lvc_sign_tmp;
         if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
         else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
-        // Accumulate PE7
-        cn_lvc_sign_tmp = lvc_sign[7][0];
-        cn_lvc_mag_tmp = lvc_mag[7][0];
-        cn_sc = cn_sc ^ cn_lvc_sign_tmp;
-        if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
-        else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
-        // Accumulate PE9
-        cn_lvc_sign_tmp = lvc_sign[9][0];
-        cn_lvc_mag_tmp = lvc_mag[9][0];
+        // Accumulate PE11
+        cn_lvc_sign_tmp = lvc_sign[11][0];
+        cn_lvc_mag_tmp = lvc_mag[11][0];
         cn_sc = cn_sc ^ cn_lvc_sign_tmp;
         if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
         else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
         cn_summary_comb[0] = {cn_sc, cn_min1, cn_min2};
 
-        // ------ CN1 (layer 0): PEs 1, 3, 8, 10 ------
-        cn_sc = lvc_sign[1][0];
-        cn_min1 = lvc_mag[1][0];
-        cn_min2 = 4'hF;
-        cn_lvc_sign_tmp = lvc_sign[3][0]; cn_lvc_mag_tmp = lvc_mag[3][0];
-        cn_sc = cn_sc ^ cn_lvc_sign_tmp;
-        if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
-        else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
-        cn_lvc_sign_tmp = lvc_sign[8][0]; cn_lvc_mag_tmp = lvc_mag[8][0];
-        cn_sc = cn_sc ^ cn_lvc_sign_tmp;
-        if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
-        else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
-        cn_lvc_sign_tmp = lvc_sign[10][0]; cn_lvc_mag_tmp = lvc_mag[10][0];
-        cn_sc = cn_sc ^ cn_lvc_sign_tmp;
-        if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
-        else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
-        cn_summary_comb[1] = {cn_sc, cn_min1, cn_min2};
-
-        // ------ CN2 (layer 0): PEs 2, 4, 6, 11 ------
+        // ------ CN1 (layer 0): PEs 2, 4, 9 (PE7 bypassed) ------
         cn_sc = lvc_sign[2][0];
         cn_min1 = lvc_mag[2][0];
         cn_min2 = 4'hF;
@@ -204,11 +181,21 @@ output reg [11:0] cv_list
         cn_sc = cn_sc ^ cn_lvc_sign_tmp;
         if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
         else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
-        cn_lvc_sign_tmp = lvc_sign[6][0]; cn_lvc_mag_tmp = lvc_mag[6][0];
+        cn_lvc_sign_tmp = lvc_sign[9][0]; cn_lvc_mag_tmp = lvc_mag[9][0];
         cn_sc = cn_sc ^ cn_lvc_sign_tmp;
         if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
         else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
-        cn_lvc_sign_tmp = lvc_sign[11][0]; cn_lvc_mag_tmp = lvc_mag[11][0];
+        cn_summary_comb[1] = {cn_sc, cn_min1, cn_min2};
+
+        // ------ CN2 (layer 0): PEs 0, 5, 10 (PE8 bypassed) ------
+        cn_sc = lvc_sign[0][0];
+        cn_min1 = lvc_mag[0][0];
+        cn_min2 = 4'hF;
+        cn_lvc_sign_tmp = lvc_sign[5][0]; cn_lvc_mag_tmp = lvc_mag[5][0];
+        cn_sc = cn_sc ^ cn_lvc_sign_tmp;
+        if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
+        else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
+        cn_lvc_sign_tmp = lvc_sign[10][0]; cn_lvc_mag_tmp = lvc_mag[10][0];
         cn_sc = cn_sc ^ cn_lvc_sign_tmp;
         if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
         else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
@@ -256,11 +243,15 @@ output reg [11:0] cv_list
         else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
         cn_summary_comb[5] = {cn_sc, cn_min1, cn_min2};
 
-        // ------ CN6 (layer 2): PEs 0, 5, 10 (PE8 bypassed) ------
-        cn_sc = lvc_sign[0][2];
-        cn_min1 = lvc_mag[0][2];
+        // ------ CN6 (layer 2): PEs 1, 3, 8, 10 — all active ------
+        cn_sc = lvc_sign[1][2];
+        cn_min1 = lvc_mag[1][2];
         cn_min2 = 4'hF;
-        cn_lvc_sign_tmp = lvc_sign[5][2]; cn_lvc_mag_tmp = lvc_mag[5][2];
+        cn_lvc_sign_tmp = lvc_sign[3][2]; cn_lvc_mag_tmp = lvc_mag[3][2];
+        cn_sc = cn_sc ^ cn_lvc_sign_tmp;
+        if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
+        else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
+        cn_lvc_sign_tmp = lvc_sign[8][2]; cn_lvc_mag_tmp = lvc_mag[8][2];
         cn_sc = cn_sc ^ cn_lvc_sign_tmp;
         if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
         else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
@@ -270,11 +261,15 @@ output reg [11:0] cv_list
         else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
         cn_summary_comb[6] = {cn_sc, cn_min1, cn_min2};
 
-        // ------ CN7 (layer 2): PEs 1, 3, 11 (PE6 bypassed) ------
-        cn_sc = lvc_sign[1][2];
-        cn_min1 = lvc_mag[1][2];
+        // ------ CN7 (layer 2): PEs 2, 4, 6, 11 — all active ------
+        cn_sc = lvc_sign[2][2];
+        cn_min1 = lvc_mag[2][2];
         cn_min2 = 4'hF;
-        cn_lvc_sign_tmp = lvc_sign[3][2]; cn_lvc_mag_tmp = lvc_mag[3][2];
+        cn_lvc_sign_tmp = lvc_sign[4][2]; cn_lvc_mag_tmp = lvc_mag[4][2];
+        cn_sc = cn_sc ^ cn_lvc_sign_tmp;
+        if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
+        else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
+        cn_lvc_sign_tmp = lvc_sign[6][2]; cn_lvc_mag_tmp = lvc_mag[6][2];
         cn_sc = cn_sc ^ cn_lvc_sign_tmp;
         if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
         else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
@@ -284,11 +279,15 @@ output reg [11:0] cv_list
         else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
         cn_summary_comb[7] = {cn_sc, cn_min1, cn_min2};
 
-        // ------ CN8 (layer 2): PEs 2, 4, 9 (PE7 bypassed) ------
-        cn_sc = lvc_sign[2][2];
-        cn_min1 = lvc_mag[2][2];
+        // ------ CN8 (layer 2): PEs 0, 5, 7, 9 — all active ------
+        cn_sc = lvc_sign[0][2];
+        cn_min1 = lvc_mag[0][2];
         cn_min2 = 4'hF;
-        cn_lvc_sign_tmp = lvc_sign[4][2]; cn_lvc_mag_tmp = lvc_mag[4][2];
+        cn_lvc_sign_tmp = lvc_sign[5][2]; cn_lvc_mag_tmp = lvc_mag[5][2];
+        cn_sc = cn_sc ^ cn_lvc_sign_tmp;
+        if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
+        else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
+        cn_lvc_sign_tmp = lvc_sign[7][2]; cn_lvc_mag_tmp = lvc_mag[7][2];
         cn_sc = cn_sc ^ cn_lvc_sign_tmp;
         if (cn_lvc_mag_tmp < cn_min1) begin cn_min2 = cn_min1; cn_min1 = cn_lvc_mag_tmp; end
         else if (cn_lvc_mag_tmp < cn_min2) begin cn_min2 = cn_lvc_mag_tmp; end
@@ -321,31 +320,31 @@ output reg [11:0] cv_list
     //
     // PE-to-CN mapping:
     //   PE  | Layer0 | Layer1 | Layer2
-    //   0   | CN0    | CN3*   | CN6      (* = bypassed)
-    //   1   | CN1    | CN4*   | CN7
-    //   2   | CN2    | CN5*   | CN8
-    //   3   | CN1    | CN4    | CN7
-    //   4   | CN2    | CN5    | CN8
-    //   5   | CN0    | CN3    | CN6
-    //   6   | CN2    | CN3    | CN7*
-    //   7   | CN0    | CN4    | CN8*
-    //   8   | CN1    | CN5    | CN6*
-    //   9   | CN0    | CN3    | CN8
-    //   10  | CN1    | CN4    | CN6
-    //   11  | CN2    | CN5    | CN7
+    //   0   | CN2    | CN3*   | CN8      (* = bypassed)
+    //   1   | CN0    | CN4*   | CN6
+    //   2   | CN1    | CN5*   | CN7
+    //   3   | CN0    | CN4    | CN6
+    //   4   | CN1    | CN5    | CN7
+    //   5   | CN2    | CN3    | CN8
+    //   6   | CN0*   | CN3    | CN7
+    //   7   | CN1*   | CN4    | CN8
+    //   8   | CN2*   | CN5    | CN6
+    //   9   | CN1    | CN3    | CN8
+    //   10  | CN2    | CN4    | CN6
+    //   11  | CN0    | CN5    | CN7
     // ---------------------------------------------------------------
-    assign mcv_t[0]  = {cn_summary[6], cn_summary[3], cn_summary[0]};
-    assign mcv_t[1]  = {cn_summary[7], cn_summary[4], cn_summary[1]};
-    assign mcv_t[2]  = {cn_summary[8], cn_summary[5], cn_summary[2]};
-    assign mcv_t[3]  = {cn_summary[7], cn_summary[4], cn_summary[1]};
-    assign mcv_t[4]  = {cn_summary[8], cn_summary[5], cn_summary[2]};
-    assign mcv_t[5]  = {cn_summary[6], cn_summary[3], cn_summary[0]};
-    assign mcv_t[6]  = {cn_summary[7], cn_summary[3], cn_summary[2]};
-    assign mcv_t[7]  = {cn_summary[8], cn_summary[4], cn_summary[0]};
-    assign mcv_t[8]  = {cn_summary[6], cn_summary[5], cn_summary[1]};
-    assign mcv_t[9]  = {cn_summary[8], cn_summary[3], cn_summary[0]};
-    assign mcv_t[10] = {cn_summary[6], cn_summary[4], cn_summary[1]};
-    assign mcv_t[11] = {cn_summary[7], cn_summary[5], cn_summary[2]};
+    assign mcv_t[0]  = {cn_summary[8], cn_summary[3], cn_summary[2]};
+    assign mcv_t[1]  = {cn_summary[6], cn_summary[4], cn_summary[0]};
+    assign mcv_t[2]  = {cn_summary[7], cn_summary[5], cn_summary[1]};
+    assign mcv_t[3]  = {cn_summary[6], cn_summary[4], cn_summary[0]};
+    assign mcv_t[4]  = {cn_summary[7], cn_summary[5], cn_summary[1]};
+    assign mcv_t[5]  = {cn_summary[8], cn_summary[3], cn_summary[2]};
+    assign mcv_t[6]  = {cn_summary[7], cn_summary[3], cn_summary[0]};
+    assign mcv_t[7]  = {cn_summary[8], cn_summary[4], cn_summary[1]};
+    assign mcv_t[8]  = {cn_summary[6], cn_summary[5], cn_summary[2]};
+    assign mcv_t[9]  = {cn_summary[8], cn_summary[3], cn_summary[1]};
+    assign mcv_t[10] = {cn_summary[6], cn_summary[4], cn_summary[2]};
+    assign mcv_t[11] = {cn_summary[7], cn_summary[5], cn_summary[0]};
 
     // ---------------------------------------------------------------
     // Pipeline: simple 2-phase (cn_sel → vn_sel)

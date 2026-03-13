@@ -1,0 +1,58 @@
+Time resolution is 1 ps
+
+============================================================
+  LDPC DECODER — MULTI-CASE VERIFICATION
+============================================================
+
+--- Test 1 ---
+  Codeword: 963 | Error at PE0 | Naive: 962
+    -> PASS  (cv_list = 963)
+--- Test 2 ---
+  Codeword: 963 | Error at PE6 | Naive: 923
+    -> PASS  (cv_list = 963)
+--- Test 3 ---
+  Codeword: 963 | Error at PE11 | Naive: 163
+    -> PASS  (cv_list = 963)
+--- Test 4 ---
+  Codeword: bad | Error at PE3 | Naive: ba5
+    -> PASS  (cv_list = bad)
+--- Test 5 ---
+  Codeword: bad | Error at PE7 | Naive: b2d
+    -> PASS  (cv_list = bad)
+--- Test 6 ---
+  Codeword: 2ce | Error at PE1 | Naive: 2cc
+    -> PASS  (cv_list = 2ce)
+--- Test 7 ---
+  Codeword: e38 | Error at PE0 | Naive: e39
+    -> PASS  (cv_list = e38)
+--- Test 8 ---
+  Codeword: 595 | Error at PE4 | Naive: 585
+    -> PASS  (cv_list = 595)
+
+--- TRIVIAL: All-zeros codeword (all LLRs = +7) ---
+--- Test  9 ---
+  Codeword: 000 | Error at PE0 | Naive: 001
+    -> PASS  (cv_list = 000)
+--- Test 10 ---
+  Codeword: 000 | Error at PE5 | Naive: 020
+    -> PASS  (cv_list = 000)
+--- Test 11 ---
+  Codeword: 000 | Error at PE9 | Naive: 200
+    -> PASS  (cv_list = 000)
+
+--- TRIVIAL: Mostly-ones codeword 0xe38 (9 bits set) ---
+--- Test 12 ---
+  Codeword: e38 | Error at PE9 | Naive: c38
+    -> PASS  (cv_list = e38)
+--- Test 13 ---
+  Codeword: e38 | Error at PE4 | Naive: e28
+    -> PASS  (cv_list = e38)
+--- Test 14 ---
+  Codeword: e38 | Error at PE1 | Naive: e3a
+    -> PASS  (cv_list = e38)
+
+============================================================
+  RESULTS:  14 / 14 tests PASSED
+============================================================
+
+$finish called at time : 3935 ns : File "/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sim_1/imports/Downloads/tb.v" Line 138

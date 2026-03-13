@@ -2,11 +2,9 @@
 2020.2
 May  7 2023
 15:10:42
-/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.sim/sim_1/behav/xsim/glbl.v,1772955997,verilog,,,,glbl,,,,,,,,
-/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sim_1/imports/Controller_Added/tb.v,1773383411,verilog,,,,tb_gen,,,,,,,,
-/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/Lvc_mem.v,1773382667,verilog,,/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/PE.v,,Lvc_mem,,,,,,,,
-/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/PE.v,1773382682,verilog,,/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/VN_Update.v,,PE,,,,,,,,
-/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/VN_Update.v,1773382713,verilog,,/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/controller.v,,VN_Update,,,,,,,,
-/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/controller.v,1773384835,verilog,,/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/gen.v,,controller,,,,,,,,
-/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/gen.v,1773382655,verilog,,/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/top.v,,gen,,,,,,,,
-/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/Controller_Added/top.v,1773383353,verilog,,/home/pradyumna/Documents/sem8/ASIC/project/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sim_1/imports/Controller_Added/tb.v,,top,,,,,,,,
+/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.sim/sim_1/behav/xsim/glbl.v,1773394328,verilog,,,,glbl,,,,,,,,
+/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sim_1/imports/Downloads/tb.v,1773406773,verilog,,,,tb_gen,,,,,,,,
+/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/Lvc_mem.v,1773402304,verilog,,/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/PE.v,,Lvc_mem,,,,,,,,
+/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/PE.v,1773402304,verilog,,/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/VN_Update.v,,PE,,,,,,,,
+/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/VN_Update.v,1773402304,verilog,,/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/gen.v,,VN_Update,,,,,,,,
+/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/gen.v,1773402304,verilog,,,,gen,,,,,,,,
