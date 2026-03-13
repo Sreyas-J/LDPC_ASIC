@@ -26,7 +26,7 @@ module tb_gen;
     wire [NUM_PE-1:0]            cv_list;
     wire                         done;
 
-    top #(.MAX_ITER(5)) dut (
+    top #(.MAX_ITER(5)) uut (
         .clk    (clk),
         .rst    (rst),
         .start  (start),
