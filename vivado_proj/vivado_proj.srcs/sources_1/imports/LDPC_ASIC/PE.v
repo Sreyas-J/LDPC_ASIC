@@ -1,87 +1,63 @@
-module PE #(
-    parameter NUM_LAYERS = 3,
-    parameter LLR_BITS   = 5
-)(
-    input                              clk,
-    input                              iter_flag,
-    input                              vn_sel,
-    input  [NUM_LAYERS-1:0]            bypass, 
-    input  [9*NUM_LAYERS-1:0]          mcv_tprev,       // Complete CN summary for this PE's layers
-    input  [LLR_BITS-1:0]             Qv,
-    output                             Cv,
-    output [LLR_BITS*NUM_LAYERS-1:0]   Lvc_out,         // Raw Lvc from memory (for gen.v CN computation)
-    output [LLR_BITS*NUM_LAYERS-1:0]   Lvc_muxed_out    // Muxed Lvc (Qv on iter_flag, else Lvc_out)
+module PE(
+    input         clk,
+    input         iter_flag,
+    input         vn_sel,
+    input  [2:0]  bypass,
+    input  [26:0] mcv_tprev,       // Complete CN summary for this PE's 3 layers
+    input  [4:0]  Qv,
+    output        Cv,
+    output [14:0] Lvc_out,         // Raw Lvc from memory (for gen.v CN computation)
+    output [14:0] Lvc_muxed_out    // Muxed Lvc (Qv on iter_flag, else Lvc_out)
     );
 
-    localparam LVC_WIDTH = LLR_BITS * NUM_LAYERS;
-
-    wire [LVC_WIDTH-1:0] mcv;
-    wire [LVC_WIDTH-1:0] Lvc_tprev;
+    wire [14:0] mcv;
+    wire [14:0] Lvc_tprev;
     reg w_ena;
-    wire [LVC_WIDTH-1:0] Lvc;
-    wire [LVC_WIDTH-1:0] Lvc_muxed;
+    wire [14:0] Lvc;
+    wire [14:0] Lvc_muxed;
 
-    // Lv width: needs to hold sum of NUM_LAYERS sign-extended 5-bit values + Qv
-    // Each mcv is 5-bit signed (-15..+15), so sum can be ±(NUM_LAYERS*15 + 15)
-    // Use enough bits: ceil(log2(NUM_LAYERS*15+15)) + 1 sign bit
-    // For safety, use LLR_BITS + $clog2(NUM_LAYERS+1) bits
-    localparam LV_BITS = LLR_BITS + $clog2(NUM_LAYERS + 1) + 1;
-    wire signed [LV_BITS-1:0] Lv;
+    wire signed [6:0] Lv;
 
     initial begin
         w_ena = 1'b0;
     end
 
-    Lvc_mem #(.DATA_WIDTH(LVC_WIDTH)) Lvc_cache(
-        .clk(clk), .din(Lvc), .w_ena(w_ena), .dout(Lvc_tprev)
-    );
-    
+    Lvc_mem Lvc_cache(.clk(clk), .din(Lvc), .w_ena(w_ena), .dout(Lvc_tprev));
+
     assign Lvc_out = Lvc_tprev;
     assign Lvc_muxed_out = Lvc_muxed;
-    
+
     genvar i;
     generate
-        for(i = 0; i < NUM_LAYERS; i = i + 1) 
-        begin : layer_inst
-            assign Lvc_muxed[LLR_BITS*i +: LLR_BITS] = (iter_flag) ? Qv : Lvc_tprev[LLR_BITS*i +: LLR_BITS];
+        for(i = 0; i < 3; i = i + 1)
+        begin
+            assign Lvc_muxed[5*i +: 5] = (iter_flag) ? Qv : Lvc_tprev[5*i +: 5];
 
-            VN_Update #(.LV_BITS(LV_BITS)) layeri_vn (
+            VN_Update layeri_vn (
                 .clk(clk),
                 .vn_ena(vn_sel),
-                .bypass(bypass[i]), 
+                .bypass(bypass[i]),
                 .mcv_tprev(mcv_tprev[9*i +: 9]),
-                .Lvc_tprev(Lvc_muxed[LLR_BITS*i +: LLR_BITS]), 
+                .Lvc_tprev(Lvc_muxed[5*i +: 5]),
                 .Lv(Lv),
-                .Lvc(Lvc[LLR_BITS*i +: LLR_BITS]),
-                .mcv(mcv[LLR_BITS*i +: LLR_BITS])
+                .Lvc(Lvc[5*i +: 5]),
+                .mcv(mcv[5*i +: 5])
             );
         end
     endgenerate
-    
+
     always @(posedge clk)
     begin
         w_ena <= vn_sel;
     end
-    
+
     // Qv sign-magnitude to 2's complement conversion
-    wire signed [LV_BITS-1:0] Qv_2scomp;
-    assign Qv_2scomp = Qv[LLR_BITS-1] ? -$signed({{(LV_BITS-LLR_BITS+1){1'b0}}, Qv[LLR_BITS-2:0]}) 
-                                        : $signed({{(LV_BITS-LLR_BITS+1){1'b0}}, Qv[LLR_BITS-2:0]});
+    wire signed [6:0] Qv_2scomp;
+    assign Qv_2scomp = Qv[4] ? -$signed({3'b000, Qv[3:0]}) : $signed({3'b000, Qv[3:0]});
 
-    // Total LLR = sum of all extrinsic messages + channel LLR
-    // Parameterized summation over NUM_LAYERS
-    reg signed [LV_BITS-1:0] mcv_sum;
-    integer k;
-    always @(*) begin
-        mcv_sum = {LV_BITS{1'b0}};
-        for (k = 0; k < NUM_LAYERS; k = k + 1) begin
-            mcv_sum = mcv_sum + $signed(mcv[LLR_BITS*k +: LLR_BITS]);
-        end
-    end
-
-    assign Lv = mcv_sum + Qv_2scomp;
-
+    // Total LLR = sum of extrinsic messages + channel LLR
+    assign Lv = $signed(mcv[4:0]) + $signed(mcv[9:5]) + $signed(mcv[14:10]) + Qv_2scomp;
     // Hard decision: Cv=1 if Lv<=0 (bit is 1), Cv=0 if Lv>0 (bit is 0)
     assign Cv = (Lv > 0) ? 1'b0 : 1'b1;
-    
+
 endmodule

@@ -4,7 +4,9 @@ May  7 2023
 15:10:42
 /home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.sim/sim_1/behav/xsim/glbl.v,1773394328,verilog,,,,glbl,,,,,,,,
 /home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sim_1/imports/Downloads/tb.v,1773417558,verilog,,,,tb_gen,,,,,,,,
-/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/Lvc_mem.v,1773402304,verilog,,/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/PE.v,,Lvc_mem,,,,,,,,
-/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/PE.v,1773402304,verilog,,/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/VN_Update.v,,PE,,,,,,,,
-/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/VN_Update.v,1773402304,verilog,,/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/gen.v,,VN_Update,,,,,,,,
-/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/gen.v,1773402304,verilog,,,,gen,,,,,,,,
+/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/Lvc_mem.v,1773429294,verilog,,/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/PE.v,,Lvc_mem,,,,,,,,
+/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/PE.v,1773429286,verilog,,/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/VN_Update.v,,PE,,,,,,,,
+/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/VN_Update.v,1773411570,verilog,,/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/controller.v,,VN_Update,,,,,,,,
+,,,,/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/gen.v,,controller,,,,,,,,
+/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/gen.v,1773402304,verilog,,/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sources_1/imports/LDPC_ASIC/top.v,,gen,,,,,,,,
+,,,,/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sim_1/imports/Downloads/tb.v,,top,,,,,,,,

@@ -27,8 +27,8 @@
 //
 // Interface
 //   Inputs  : clk, rst (async active-high), start (pulse ≥1 cycle)
-//   Outputs : iter_flag, cn_reset, cn_sel, vn_sel — directly to gen.v
-//             done — pulses high for 1 cycle when decoding is complete
+//   Outputs : iter_flag, cn_reset, cn_sel, vn_sel - directly to gen.v
+//             done - pulses high for 1 cycle when decoding is complete
 
 module controller #(
     parameter MAX_ITER = 5
@@ -95,7 +95,7 @@ module controller #(
                 end
 
                 // ------------------------------------------------
-                // RUN: phases 1–5, repeated MAX_ITER times
+                // RUN: phases 1-5, repeated MAX_ITER times
                 // ------------------------------------------------
                 RUN: begin
                     case (phase)
@@ -109,7 +109,7 @@ module controller #(
                             phase <= 3'd2;
                         end
 
-                        // Phase 2: assert vn_sel — gen.v / PE will act on
+                        // Phase 2: assert vn_sel - gen.v / PE will act on
                         // it on the next posedge.
                         // Keep iter_flag=1 for iter 0: the VN_Update uses
                         // Lvc_muxed (= Qv when iter_flag=1) for sign/magnitude
@@ -146,7 +146,7 @@ module controller #(
                                 state <= DONE;
                             end else begin
                                 // Assert CN phase for next iteration
-                                // (iter_flag stays 0 — use stored Lvc)
+                                // (iter_flag stays 0 - use stored Lvc)
                                 cn_sel     <= 1'b1;
                                 cn_reset   <= 1'b1;
                                 iter_count <= iter_count + 1'b1;
