@@ -10,7 +10,7 @@
 //  No manual cn_sel / vn_sel / iter_flag driving needed —
 //  the controller handles all sequencing automatically.
 //
-//  Valid codewords for this (3,4)-regular LDPC graph:
+//  Valid codewords for this H matrix (null space over GF(2)):
 //    0x000, 0x2ce, 0x595, 0x75b, 0x963, 0xbad, 0xcf6, 0xe38
 // ============================================================
 
@@ -60,7 +60,6 @@ module tb_gen;
 
     // Run one complete test case.
     // Loads LLRs, pulses start, waits for done, checks result.
-    // No manual sequencing — the controller handles everything.
     task run_test;
         input [11:0] codeword;
         input [3:0]  error_pe;
@@ -121,7 +120,7 @@ module tb_gen;
         $display("--- Test 11 ---");  run_test(12'h000, 4'd9);
 
         $display("");
-        $display("--- TRIVIAL: Mostly-ones codeword 0xe38 (9 bits set) ---");
+        $display("--- Mostly-ones codeword 0xe38 (9 bits set) ---");
         $display("--- Test 12 ---");  run_test(12'he38, 4'd9);
         $display("--- Test 13 ---");  run_test(12'he38, 4'd4);
         $display("--- Test 14 ---");  run_test(12'he38, 4'd1);
