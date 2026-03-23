@@ -2,6 +2,7 @@ module VN_Update #(
     parameter LV_BITS = 7
 )(
     input clk,
+    input rst,
     input vn_ena,
     input bypass,
     input [8:0] mcv_tprev,
@@ -14,20 +15,14 @@ module VN_Update #(
     wire sc_tprev, Lvc_tprev_sign;
     wire [3:0] min1c_tprev, min2c_tprev, Lvc_tprev_mag;
 
-    reg signed [4:0] Lvc_reg;   // internal 2's-complement LLR (-15..+15)
-    reg signed [4:0] Lvc_abs;   // absolute value helper
+    reg signed [4:0] Lvc_reg;
+    reg signed [4:0] Lvc_abs;
 
     wire mcv_sign;
     reg [3:0] mcv_mag;
 
     reg [4:0] mcv_latch;
     reg [4:0] Lvc_latch;
-
-    initial begin
-        mcv_latch = 5'b0;
-        Lvc_latch = 5'b0;
-        Lvc_reg   = 5'b0;
-    end
 
     // Input slicing
     assign sc_tprev        = mcv_tprev[8];
@@ -36,7 +31,7 @@ module VN_Update #(
     assign Lvc_tprev_sign  = Lvc_tprev[4];
     assign Lvc_tprev_mag   = Lvc_tprev[3:0];
 
-    // mcv_mag selection (magnitudes only)
+    // mcv_mag selection
     always @(*) begin
         if (min1c_tprev == Lvc_tprev_mag) mcv_mag = min2c_tprev;
         else                               mcv_mag = min1c_tprev;
@@ -44,7 +39,7 @@ module VN_Update #(
 
     assign mcv_sign = Lvc_tprev_sign ^ sc_tprev;
 
-    // mcv latch (2's-complement extrinsic)
+    // mcv latch
     always @(*) begin
         if (bypass)
             mcv_latch = 5'b0;
@@ -53,19 +48,24 @@ module VN_Update #(
     end
     assign mcv = mcv_latch;
 
-    // Saturation (Lv - mcv can exceed 5-bit range → clamp)
+    // Saturation
     wire signed [LV_BITS-1:0] Lvc_full;
     wire signed [LV_BITS-1:0] mcv_ext;
     assign mcv_ext = {{(LV_BITS-5){mcv[4]}}, mcv};
     assign Lvc_full = Lv - mcv_ext;
 
     always @(posedge clk) begin
-        if      (Lvc_full >  $signed({{(LV_BITS-5){1'b0}}, 5'sd15}))  Lvc_reg <=  5'sd15;
-        else if (Lvc_full < -$signed({{(LV_BITS-5){1'b0}}, 5'sd15}))  Lvc_reg <= -5'sd15;
-        else                                                            Lvc_reg <= Lvc_full[4:0];
+        if (rst)
+            Lvc_reg <= 5'sd0;
+        else if (Lvc_full >  $signed({{(LV_BITS-5){1'b0}}, 5'sd15}))
+            Lvc_reg <=  5'sd15;
+        else if (Lvc_full < -$signed({{(LV_BITS-5){1'b0}}, 5'sd15}))
+            Lvc_reg <= -5'sd15;
+        else
+            Lvc_reg <= Lvc_full[4:0];
     end
 
-    // Absolute value for correct sign-magnitude output
+    // Absolute value
     always @(*) begin
         Lvc_abs = Lvc_reg[4] ? -Lvc_reg : Lvc_reg;
     end
