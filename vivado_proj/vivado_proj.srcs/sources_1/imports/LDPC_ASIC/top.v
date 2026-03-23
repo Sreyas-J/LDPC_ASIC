@@ -13,9 +13,9 @@
 //   done    - pulses high for 1 cycle when decoding is complete
 
 module top #(
-    parameter N        = 12,
-    parameter M        = 9,
-    parameter MAX_DC   = 4,
+    parameter N        = 672,
+    parameter M        = 126,
+    parameter MAX_DC   = 15,
     parameter MAX_DV   = 3,
     parameter MAX_ITER = 5
 )(

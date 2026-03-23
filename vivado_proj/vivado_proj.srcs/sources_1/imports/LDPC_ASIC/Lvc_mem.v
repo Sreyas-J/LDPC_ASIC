@@ -1,16 +1,17 @@
-module Lvc_mem(
-
-input clk,
-input [14:0] din,
-input w_ena,
-output reg [14:0] dout
+module Lvc_mem #(
+    parameter MAX_DV = 3
+)(
+    input clk,
+    input [5*MAX_DV-1:0] din,
+    input w_ena,
+    output reg [5*MAX_DV-1:0] dout
 );
 
-    reg [14:0] mem;
+    reg [5*MAX_DV-1:0] mem;
 
     initial begin
-        mem  = 15'b0;
-        dout = 15'b0;
+        mem  = {(5*MAX_DV){1'b0}};
+        dout = {(5*MAX_DV){1'b0}};
     end
 
     always @(posedge clk)
@@ -22,6 +23,5 @@ output reg [14:0] dout
     begin
         dout <= mem;
     end
-
 
 endmodule
