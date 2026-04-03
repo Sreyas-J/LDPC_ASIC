@@ -1,0 +1,25 @@
+Time resolution is 1 ps
+
+============================================================
+  LDPC DECODER (N=12, M=9) - VERIFICATION
+============================================================
+--- All-zeros codeword, single-bit errors ---
+  Error at PE0
+    -> PASS
+  Error at PE5
+    -> PASS
+  Error at PE42
+    -> PASS
+  Error at PE100
+    -> PASS
+  Error at PE200
+    -> PASS
+  Error at PE400
+    -> PASS
+  Error at PE671
+    -> PASS
+
+============================================================
+  RESULTS:  7 / 7 tests PASSED
+============================================================
+$finish called at time : 1975 ns : File "/home/dell/Desktop/IIITB/8thSem/ASICproj/LDPC_ASIC/vivado_proj/vivado_proj.srcs/sim_1/imports/Downloads/tb.v" Line 107
