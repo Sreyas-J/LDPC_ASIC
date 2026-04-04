@@ -37,10 +37,24 @@ module tb_gen;
         .done   (done)
     );
 
+    integer idx;
     initial begin 
         clk = 0; 
         $dumpfile("/tmp/ldpc_sim.vcd");
-        $dumpvars(0, tb_gen);
+        // Only dump specific signals to keep VCD small and clock clean
+        $dumpvars(0, clk);
+        $dumpvars(0, rst);
+        $dumpvars(0, start);
+        $dumpvars(0, qv_flat);
+        $dumpvars(0, cv_list);
+        $dumpvars(0, done);
+        // Dump unpacked mcv_t array
+        for (idx = 0; idx < N; idx = idx + 1) begin
+            $dumpvars(0, tb_gen.dut.gen_core.Lvc_out[idx]);
+        end
+        for (idx = 0; idx < N; idx = idx + 1) begin
+            $dumpvars(0, tb_gen.dut.gen_core.Lvc_out[idx]);
+        end
         forever #5 clk = ~clk; 
     end
 
@@ -102,6 +116,11 @@ module tb_gen;
             end
         end
     endtask
+    
+//    initial begin
+//          $dumpfile("waveform.vcd");
+//          $dumpvars;
+//        end
 
     // ---- main test sequence ------------------------------------
     initial begin

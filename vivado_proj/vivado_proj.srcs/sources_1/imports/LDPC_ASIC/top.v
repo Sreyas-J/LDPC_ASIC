@@ -17,7 +17,7 @@ module top #(
     parameter M        = 126,
     parameter MAX_DC   = 15,
     parameter MAX_DV   = 3,
-    parameter MAX_ITER = 5
+    parameter MAX_ITER = 0
 )(
     input  wire            clk,
     input  wire            rst,
