@@ -1,77 +1,104 @@
 `timescale 1ns / 1ps
 
 // ============================================================
-//  LDPC Decoder - Testbench (controller-based, parameterized)
+//  LDPC Decoder - Testbench (AXI4-Stream I/O, parameterized)
 //
-//  Instantiates the top module (gen + controller).
-//  The testbench only drives: clk, rst, start, qv_flat.
-//  It waits for the 'done' pulse, then checks cv_list.
+//  The testbench acts as:
+//    - AXI Stream Master: sends qv_flat LLRs to the DUT
+//    - AXI Stream Slave:  receives cv_list from the DUT
 //
-//  Valid codewords for the default H matrix (null space over GF(2)):
-//    0x000, 0x2ce, 0x595, 0x75b, 0x963, 0xbad, 0xcf6, 0xe38
+//  Data is transferred in DATA_WIDTH-bit beats.
 // ============================================================
 
 module tb_gen;
 
     // ---- Parameters (match top/gen defaults) ----
-    parameter N        = 672;
-    parameter M        = 126;
-    parameter MAX_DC   = 15;
-    parameter MAX_DV   = 3;
-    parameter MAX_ITER = 5;
+    parameter N          = 672;
+    parameter M          = 126;
+    parameter MAX_DC     = 15;
+    parameter MAX_DV     = 3;
+    parameter MAX_ITER   = 5;
+    parameter DATA_WIDTH = 256;
 
-    reg                clk, rst, start;
-    reg  [N*5-1:0]     qv_flat;
-    wire [N-1:0]       cv_list;
-    wire               done;
+    localparam QV_BITS       = N * 5;
+    localparam NUM_IN_BEATS  = (QV_BITS + DATA_WIDTH - 1) / DATA_WIDTH;
+    localparam QV_PAD_BITS   = NUM_IN_BEATS * DATA_WIDTH;
+    localparam NUM_OUT_BEATS = (N + DATA_WIDTH - 1) / DATA_WIDTH;
+    localparam CV_PAD_BITS   = NUM_OUT_BEATS * DATA_WIDTH;
+
+    reg                    clk, rst;
+
+    // AXI Stream Master signals (TB -> DUT input)
+    reg  [DATA_WIDTH-1:0]  s_axis_tdata;
+    reg                    s_axis_tvalid;
+    wire                   s_axis_tready;
+    reg                    s_axis_tlast;
+
+    // AXI Stream Slave signals (DUT -> TB output)
+    wire [DATA_WIDTH-1:0]  m_axis_tdata;
+    wire                   m_axis_tvalid;
+    reg                    m_axis_tready;
+    wire                   m_axis_tlast;
+
+    // Reconstructed cv_list from output stream
+    reg  [N-1:0]           cv_list_received;
 
     top #(
         .N(N), .M(M), .MAX_DC(MAX_DC), .MAX_DV(MAX_DV),
-        .MAX_ITER(MAX_ITER)
+        .MAX_ITER(MAX_ITER), .DATA_WIDTH(DATA_WIDTH)
     ) dut (
-        .clk    (clk),
-        .rst    (rst),
-        .start  (start),
-        .qv_flat(qv_flat),
-        .cv_list(cv_list),
-        .done   (done)
+        .clk           (clk),
+        .rst           (rst),
+        .s_axis_tdata  (s_axis_tdata),
+        .s_axis_tvalid (s_axis_tvalid),
+        .s_axis_tready (s_axis_tready),
+        .s_axis_tlast  (s_axis_tlast),
+        .m_axis_tdata  (m_axis_tdata),
+        .m_axis_tvalid (m_axis_tvalid),
+        .m_axis_tready (m_axis_tready),
+        .m_axis_tlast  (m_axis_tlast)
     );
 
     integer idx;
-    initial begin 
-        clk = 0; 
+    initial begin
+        clk = 0;
         $dumpfile("/tmp/ldpc_sim.vcd");
-        // Only dump specific signals to keep VCD small and clock clean
         $dumpvars(0, clk);
         $dumpvars(0, rst);
-        $dumpvars(0, start);
-        $dumpvars(0, qv_flat);
-        $dumpvars(0, cv_list);
-        $dumpvars(0, done);
+        $dumpvars(0, s_axis_tdata);
+        $dumpvars(0, s_axis_tvalid);
+        $dumpvars(0, s_axis_tready);
+        $dumpvars(0, s_axis_tlast);
+        $dumpvars(0, m_axis_tdata);
+        $dumpvars(0, m_axis_tvalid);
+        $dumpvars(0, m_axis_tready);
+        $dumpvars(0, m_axis_tlast);
+        $dumpvars(0, cv_list_received);
         // Dump unpacked mcv_t array
         for (idx = 0; idx < N; idx = idx + 1) begin
-            $dumpvars(0, tb_gen.dut.gen_core.Lvc_out[idx]);
+            $dumpvars(0, tb_gen.dut.gen_core.mcv_t[idx]);
         end
         for (idx = 0; idx < N; idx = idx + 1) begin
             $dumpvars(0, tb_gen.dut.gen_core.Lvc_out[idx]);
         end
-        forever #5 clk = ~clk; 
+        forever #5 clk = ~clk;
     end
 
     // ---- helpers ------------------------------------------------
     integer pass_count, fail_count;
     initial begin pass_count = 0; fail_count = 0; end
 
+    // Padded internal qv_flat register
+    reg [QV_PAD_BITS-1:0] qv_flat_padded;
+
     // Build qv_flat from codeword + introduced error.
-    // PE k's 5-bit LLR occupies qv_flat[5*k +: 5].
-    // bit=1 -> -7 (5'h17), bit=0 -> +7 (5'h07). Error PE gets sign flipped.
-    task load_qv;
+    task build_qv;
         input [N-1:0] codeword;
         input integer error_pe;
         integer k;
         reg [4:0] val;
         begin
-            qv_flat = {(N*5){1'b0}};
+            qv_flat_padded = {QV_PAD_BITS{1'b0}};
             for (k = 0; k < N; k = k + 1) begin
                 if (codeword[k])
                     val = 5'h17;       // bit=1 -> -7
@@ -79,13 +106,70 @@ module tb_gen;
                     val = 5'h07;       // bit=0 -> +7
                 if (k == error_pe)
                     val = val ^ 5'h10; // flip sign bit to simulate channel error
-                qv_flat[5*k +: 5] = val;
+                qv_flat_padded[5*k +: 5] = val;
             end
         end
     endtask
 
+    // Send qv_flat data over AXI Stream to DUT.
+    // Uses proper TVALID/TREADY handshake.
+    task send_axis_input;
+        integer beat;
+        begin
+            for (beat = 0; beat < NUM_IN_BEATS; beat = beat + 1) begin
+                // Drive data and valid before the clock edge
+                @(posedge clk); #1;
+                s_axis_tdata  = qv_flat_padded[beat*DATA_WIDTH +: DATA_WIDTH];
+                s_axis_tvalid = 1'b1;
+                s_axis_tlast  = (beat == NUM_IN_BEATS - 1) ? 1'b1 : 1'b0;
+                // Wait until handshake completes (both valid and ready high at posedge)
+                begin : wait_handshake_in
+                    forever begin
+                        @(posedge clk);
+                        if (s_axis_tready) begin
+                            #1;
+                            // Deassert valid immediately to prevent double-acceptance
+                            s_axis_tvalid = 1'b0;
+                            s_axis_tlast  = 1'b0;
+                            disable wait_handshake_in;
+                        end
+                    end
+                end
+            end
+            // Ensure clean deassert
+            s_axis_tvalid = 1'b0;
+            s_axis_tlast  = 1'b0;
+            s_axis_tdata  = {DATA_WIDTH{1'b0}};
+        end
+    endtask
+
+    // Receive cv_list from AXI Stream output.
+    task receive_axis_output;
+        integer beat;
+        reg [CV_PAD_BITS-1:0] cv_padded;
+        begin
+            cv_padded = {CV_PAD_BITS{1'b0}};
+            m_axis_tready = 1'b1;
+            beat = 0;
+            begin : wait_output
+                forever begin
+                    @(posedge clk);
+                    if (m_axis_tvalid && m_axis_tready) begin
+                        cv_padded[beat*DATA_WIDTH +: DATA_WIDTH] = m_axis_tdata;
+                        if (m_axis_tlast || beat == NUM_OUT_BEATS - 1) begin
+                            disable wait_output;
+                        end
+                        beat = beat + 1;
+                    end
+                end
+            end
+            #1;
+            m_axis_tready = 1'b0;
+            cv_list_received = cv_padded[N-1:0];
+        end
+    endtask
+
     // Run one complete test case.
-    // Loads LLRs, pulses start, waits for done, checks result.
     task run_test;
         input [N-1:0] codeword;
         input integer error_pe;
@@ -95,36 +179,28 @@ module tb_gen;
             $display("  Codeword: %3h | Error at PE%0d | Naive: %3h",
                      codeword, error_pe, naive);
 
-            load_qv(codeword, error_pe);
+            build_qv(codeword, error_pe);
+            send_axis_input;
+            receive_axis_output;
 
-            // Pulse start for one cycle
-            @(posedge clk); #1;
-            start = 1'b1;
-            @(posedge clk); #1;
-            start = 1'b0;
-
-            // Wait for the controller's done pulse
-            @(posedge done);
-
-            // cv_list was stable before done fired; sample it now
-            if (cv_list == codeword) begin
-                $display("    -> PASS  (cv_list = %3h)", cv_list);
+            if (cv_list_received == codeword) begin
+                $display("    -> PASS  (cv_list = %3h)", cv_list_received);
                 pass_count = pass_count + 1;
             end else begin
-                $display("    -> FAIL  (cv_list = %3h, want %3h)", cv_list, codeword);
+                $display("    -> FAIL  (cv_list = %3h, want %3h)", cv_list_received, codeword);
                 fail_count = fail_count + 1;
             end
         end
     endtask
-    
-//    initial begin
-//          $dumpfile("waveform.vcd");
-//          $dumpvars;
-//        end
 
     // ---- main test sequence ------------------------------------
     initial begin
-        rst = 1; start = 0; qv_flat = {(N*5){1'b0}};
+        rst = 1;
+        s_axis_tdata  = {DATA_WIDTH{1'b0}};
+        s_axis_tvalid = 1'b0;
+        s_axis_tlast  = 1'b0;
+        m_axis_tready = 1'b0;
+
         @(posedge clk); #1;
         @(posedge clk); #1;
         rst = 0;
@@ -132,6 +208,7 @@ module tb_gen;
         $display("");
         $display("============================================================");
         $display("  LDPC DECODER - MULTI-CASE VERIFICATION (N=%0d, M=%0d)", N, M);
+        $display("  AXI Stream I/O (DATA_WIDTH=%0d)", DATA_WIDTH);
         $display("============================================================");
         $display("");
 
