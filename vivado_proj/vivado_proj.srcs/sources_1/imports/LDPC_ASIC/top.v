@@ -165,6 +165,7 @@ module top #(
         .N(N), .M(M), .MAX_DC(MAX_DC), .MAX_DV(MAX_DV)
     ) gen_core (
         .clk      (clk),
+        .rst      (rst),
         .iter_flag(iter_flag),
         .cn_reset (cn_reset),
         .cn_sel   (cn_sel),

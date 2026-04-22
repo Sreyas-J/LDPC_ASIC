@@ -3,6 +3,7 @@ module PE #(
     parameter LV_BITS = 7
 )(
     input                        clk,
+    input                        rst,
     input                        iter_flag,
     input                        vn_sel,
     input  [MAX_DV-1:0]          bypass,
@@ -21,12 +22,8 @@ module PE #(
 
     wire signed [LV_BITS-1:0] Lv;
 
-    initial begin
-        w_ena = 1'b0;
-    end
-
     Lvc_mem #(.MAX_DV(MAX_DV)) Lvc_cache(
-        .clk(clk), .din(Lvc), .w_ena(w_ena), .dout(Lvc_tprev)
+        .clk(clk), .rst(rst), .din(Lvc), .w_ena(w_ena), .dout(Lvc_tprev)
     );
 
     assign Lvc_out = Lvc_tprev;
@@ -40,6 +37,7 @@ module PE #(
 
             VN_Update #(.LV_BITS(LV_BITS)) layeri_vn (
                 .clk(clk),
+                .rst(rst),
                 .vn_ena(vn_sel),
                 .bypass(bypass[i]),
                 .mcv_tprev(mcv_tprev[9*i +: 9]),
@@ -51,9 +49,12 @@ module PE #(
         end
     endgenerate
 
-    always @(posedge clk)
+    always @(posedge clk or posedge rst)
     begin
-        w_ena <= vn_sel;
+        if (rst)
+            w_ena <= 1'b0;
+        else
+            w_ena <= vn_sel;
     end
 
     // Qv sign-magnitude to 2's complement conversion
