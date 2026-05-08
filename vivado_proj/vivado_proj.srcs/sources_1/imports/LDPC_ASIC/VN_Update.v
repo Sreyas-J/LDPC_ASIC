@@ -39,12 +39,20 @@ module VN_Update #(
 
     assign mcv_sign = Lvc_tprev_sign ^ sc_tprev;
 
+    // mcv in 2's complement: -(mcv_mag) or +(mcv_mag)
+    wire [4:0] mcv_pos = {1'b0, mcv_mag};
+    wire [4:0] mcv_neg = ~{1'b0, mcv_mag} + 5'd1;
+
     // mcv latch (2's-complement extrinsic) — intentional transparent latch
+    // synthesis translate_off
+    // synopsys translate_off
+    // synthesis translate_on
+    // synopsys translate_on
     always @(*) begin
         if (bypass)
             mcv_latch = 5'b0;
         else if (vn_ena)
-            mcv_latch = (mcv_sign) ? -{1'b0, mcv_mag} : {1'b0, mcv_mag};
+            mcv_latch = (mcv_sign) ? mcv_neg : mcv_pos;
     end
     assign mcv = mcv_latch;
 
@@ -64,7 +72,7 @@ module VN_Update #(
 
     // Absolute value for correct sign-magnitude output
     always @(*) begin
-        Lvc_abs = Lvc_reg[4] ? -Lvc_reg : Lvc_reg;
+        Lvc_abs = Lvc_reg[4] ? (~Lvc_reg + 5'd1) : Lvc_reg;
     end
 
     // Lvc latch — intentional transparent latch

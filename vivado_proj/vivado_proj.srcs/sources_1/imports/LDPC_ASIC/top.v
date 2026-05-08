@@ -79,8 +79,8 @@ module top #(
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             state          <= S_LOAD;
-            in_beat_cnt    <= 0;
-            out_beat_cnt   <= 0;
+            in_beat_cnt    <= {IN_CNT_W{1'b0}};
+            out_beat_cnt   <= {OUT_CNT_W{1'b0}};
             qv_flat_padded <= {QV_PAD_BITS{1'b0}};
             cv_list_padded <= {CV_PAD_BITS{1'b0}};
             start          <= 1'b0;
@@ -101,9 +101,9 @@ module top #(
                         if (s_axis_tlast) begin
                             start       <= 1'b1;
                             state       <= S_DECODE;
-                            in_beat_cnt <= 0;
+                            in_beat_cnt <= {IN_CNT_W{1'b0}};
                         end else begin
-                            in_beat_cnt <= in_beat_cnt + 1;
+                            in_beat_cnt <= in_beat_cnt + {{(IN_CNT_W-1){1'b0}}, 1'b1};
                         end
                     end
                 end
@@ -115,7 +115,7 @@ module top #(
                     if (done) begin
                         cv_list_padded          <= {{(CV_PAD_BITS-N){1'b0}}, cv_list};
                         state                   <= S_OUTPUT;
-                        out_beat_cnt            <= 0;
+                        out_beat_cnt            <= {OUT_CNT_W{1'b0}};
                         m_axis_tvalid           <= 1'b1;
                     end
                 end
@@ -129,10 +129,10 @@ module top #(
                     if (m_axis_tvalid && m_axis_tready) begin
                         if (out_beat_cnt == NUM_OUT_BEATS - 1) begin
                             state         <= S_LOAD;
-                            out_beat_cnt  <= 0;
+                            out_beat_cnt  <= {OUT_CNT_W{1'b0}};
                             m_axis_tvalid <= 1'b0;
                         end else begin
-                            out_beat_cnt <= out_beat_cnt + 1;
+                            out_beat_cnt <= out_beat_cnt + {{(OUT_CNT_W-1){1'b0}}, 1'b1};
                         end
                     end
                 end
@@ -167,7 +167,6 @@ module top #(
         .clk      (clk),
         .rst      (rst),
         .iter_flag(iter_flag),
-        .cn_reset (cn_reset),
         .cn_sel   (cn_sel),
         .vn_sel   (vn_sel),
         .qv_flat  (qv_flat),

@@ -7,7 +7,6 @@ module gen #(
     input clk,
     input rst,
     input iter_flag,
-    input cn_reset,
     input cn_sel,
     input vn_sel,
     input [N*5-1:0] qv_flat,
@@ -5267,7 +5266,7 @@ module gen #(
         end
     endgenerate
 
-    wire [5*MAX_DV-1:0] Lvc_out   [0:N-1];
+    wire [5*MAX_DV-1:0] Lvc_out   [0:N-1]; // driven by PE, used for debug/probing
     wire [5*MAX_DV-1:0] Lvc_muxed [0:N-1];
 
     reg [8:0] cn_summary [0:M-1];

@@ -11,22 +11,22 @@
 //   Phase 1  : gen.v captures cn_summary  (idle controller output)
 //   Phase 2  : vn_sel=1 registered  (first VN cycle)
 //   Phase 3  : vn_sel=1 registered AGAIN (second VN cycle)
-//              At phase 3 posedge: PE sees vn_sel=1 → mcv_latch open (correct
-//              mcv) → Lvc_reg updated correctly.  After phase 3 NBA, vn_sel
+//              At phase 3 posedge: PE sees vn_sel=1 -> mcv_latch open (correct
+//              mcv) -> Lvc_reg updated correctly.  After phase 3 NBA, vn_sel
 //              is still 1 (registered), so Lvc_latch stays open and captures
 //              the new Lvc_reg.  This is necessary because Lvc_latch is an
 //              inferred transparent latch; with a registered controller the
 //              latch would otherwise close before seeing the updated Lvc_reg.
-//   Phase 4  : PE sees vn_sel=1 from phase 3 → w_ena=1 → Lvc_mem written;
-//              vn_sel_d=1 → cv_list captured.
-//   Phase 5  : cv_list valid; if last iter → DONE, else assert cn_sel=1
+//   Phase 4  : PE sees vn_sel=1 from phase 3 -> w_ena=1 -> Lvc_mem written;
+//              vn_sel_d=1 -> cv_list captured.
+//   Phase 5  : cv_list valid; if last iter -> ST_DONE, else assert cn_sel=1
 //              for next iteration and return to phase 1
 //
-// The IDLE→RUN transition asserts the phase-0 outputs immediately
+// The IDLE->RUN transition asserts the phase-0 outputs immediately
 // (same posedge as start), saving one dead cycle.
 //
 // Interface
-//   Inputs  : clk, rst (async active-high), start (pulse ≥1 cycle)
+//   Inputs  : clk, rst (async active-high), start (pulse >=1 cycle)
 //   Outputs : iter_flag, cn_reset, cn_sel, vn_sel - directly to gen.v
 //             done - pulses high for 1 cycle when decoding is complete
 
@@ -47,9 +47,9 @@ module controller #(
     // ----------------------------------------------------------------
     // State encoding
     // ----------------------------------------------------------------
-    localparam IDLE = 2'd0;
-    localparam RUN  = 2'd1;
-    localparam DONE = 2'd2;
+    localparam ST_IDLE = 2'd0;
+    localparam ST_RUN  = 2'd1;
+    localparam ST_DONE = 2'd2;
 
     reg [1:0] state;
     reg [2:0] phase;          // 1..5 within one iteration
@@ -60,7 +60,7 @@ module controller #(
     // ----------------------------------------------------------------
     always @(posedge clk or posedge rst) begin
         if (rst) begin
-            state      <= IDLE;
+            state      <= ST_IDLE;
             phase      <= 3'd0;
             iter_count <= 4'd0;
             iter_flag  <= 1'b0;
@@ -79,25 +79,25 @@ module controller #(
             case (state)
 
                 // ------------------------------------------------
-                // IDLE: wait for start pulse
+                // ST_IDLE: wait for start pulse
                 // On the same posedge as start, register the phase-0
                 // outputs so gen.v sees them on the very next cycle.
                 // ------------------------------------------------
-                IDLE: begin
+                ST_IDLE: begin
                     if (start) begin
                         cn_sel     <= 1'b1;   // gen.v captures CN next cycle
                         cn_reset   <= 1'b1;
                         iter_flag  <= 1'b1;   // first iteration: mux Qv
-                        state      <= RUN;
+                        state      <= ST_RUN;
                         phase      <= 3'd1;
                         iter_count <= 4'd0;
                     end
                 end
 
                 // ------------------------------------------------
-                // RUN: phases 1-5, repeated MAX_ITER times
+                // ST_RUN: phases 1-5, repeated MAX_ITER times
                 // ------------------------------------------------
-                RUN: begin
+                ST_RUN: begin
                     case (phase)
 
                         // Phase 1: gen.v is sampling cn_sel=1 (registered
@@ -143,7 +143,7 @@ module controller #(
                         // Either finish or kick off the next iteration.
                         3'd5: begin
                             if (iter_count == MAX_ITER - 1) begin
-                                state <= DONE;
+                                state <= ST_DONE;
                             end else begin
                                 // Assert CN phase for next iteration
                                 // (iter_flag stays 0 - use stored Lvc)
@@ -159,14 +159,14 @@ module controller #(
                 end
 
                 // ------------------------------------------------
-                // DONE: pulse done for one cycle then return to IDLE
+                // ST_DONE: pulse done for one cycle then return to ST_IDLE
                 // ------------------------------------------------
-                DONE: begin
+                ST_DONE: begin
                     done  <= 1'b1;
-                    state <= IDLE;
+                    state <= ST_IDLE;
                 end
 
-                default: state <= IDLE;
+                default: state <= ST_IDLE;
 
             endcase
         end

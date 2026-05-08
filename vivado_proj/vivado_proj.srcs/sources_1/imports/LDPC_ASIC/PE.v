@@ -65,11 +65,19 @@ module PE #(
 
     // Total LLR = sum of all extrinsic messages + channel LLR
     reg signed [LV_BITS-1:0] Lv_sum;
+    genvar gk;
+    wire signed [LV_BITS-1:0] mcv_ext [0:MAX_DV-1];
+    generate
+        for (gk = 0; gk < MAX_DV; gk = gk + 1) begin : mcv_sext
+            assign mcv_ext[gk] = {{(LV_BITS-5){mcv[5*gk+4]}}, mcv[5*gk +: 5]};
+        end
+    endgenerate
+
     integer k;
     always @(*) begin
         Lv_sum = Qv_2scomp;
         for (k = 0; k < MAX_DV; k = k + 1)
-            Lv_sum = Lv_sum + $signed(mcv[5*k +: 5]);
+            Lv_sum = Lv_sum + mcv_ext[k];
     end
     assign Lv = Lv_sum;
 
